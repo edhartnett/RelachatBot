@@ -24,4 +24,5 @@ class Analyst(BaseModel):
 
     @property
     def persona(self) -> str:
-        return f"Name: {self.name}\nRole: {self.role}\nAffiliation: {self.affiliation}\nDescription: {self.description}\nQuirky Fact: {self.quirky_fact}\nRelationship History: {self.relationship_history}"
+        return f'''Name: {self.name}\nRole: {self.role}\nAffiliation: {self.affiliation}\n
+        Description: {self.description}\nQuirky Fact: {self.quirky_fact}\nRelationship History: {self.relationship_history}'''
