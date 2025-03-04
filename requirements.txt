@@ -1,0 +1,8 @@
+langgraph 
+langchain_openai 
+langchain_community 
+langchain_core 
+tavily-python 
+wikipedia
+langchain-anthropic
+langchain-google-genai
