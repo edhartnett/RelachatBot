@@ -17,19 +17,15 @@ analyst_instructions="""You are tasked with creating a set of AI analyst persona
 1. First, review the research topic:
 {topic}
         
-2. Determine a list of important themes or questions that should be addressed by the analysts.
+2. Determine a list of {max_analysts} important themes or questions that should be addressed by the analysts.
 
 3. Examine any editorial feedback that has been optionally provided to guide creation of the analysts: 
         
 {human_analyst_feedback}
     
-4. Select a list of people, alive or historical, based upon documents and / or feedback above. Include some famous 
-people, like Winston Churchill, Jesus, or Marie Curie. Also include some random people from history, like Johm Carpenter, 
-a 12th century builder from London, or Marcus Lepitus, a Roman soldier. 
+4. Select a list of {max_analysts} famous people, alive or historical, like Winston Churchill, Jesus, or a Roman Emporer. 
                     
-5. Pick the top {max_analysts} people to be analysts.
-
-6. Assign one analyst to each theme."""
+5. Assign one theme to each analyst."""
 
 
 class RelachatBot:
@@ -49,8 +45,8 @@ class RelachatBot:
 
         # System message
         system_message = analyst_instructions.format(topic=topic,
-                                                                human_analyst_feedback=human_analyst_feedback, 
-                                                                max_analysts=max_analysts)
+                                                     human_analyst_feedback=human_analyst_feedback, 
+                                                     max_analysts=max_analysts)
 
         # Generate question 
         analysts = structured_llm.invoke([SystemMessage(content=system_message)]+[HumanMessage(content="Generate the set of analysts.")])
@@ -80,12 +76,12 @@ class RelachatBot:
 
         self.model = init_chat_model("anthropic:claude-3-5-sonnet-latest", temperature=0)
         #model = init_chat_model("gemini-2.0-flash-001", model_provider="google_vertexai")
-        messages = [
-            SystemMessage("Translate the following from English into Italian"),
-            HumanMessage("hi!"),
-        ]
-        result = self.model.invoke(messages)
-        print(result)
+        #messages = [
+        #     SystemMessage("Translate the following from English into Italian"),
+        #     HumanMessage("hi!"),
+        # ]
+        # result = self.model.invoke(messages)
+        # print(result)
 
         # Add nodes and edges 
         builder = StateGraph(GenerateAnalystsState)
@@ -123,13 +119,34 @@ class RelachatBot:
                     print(f"Affiliation: {analyst.affiliation}")
                     print(f"Role: {analyst.role}")
                     print(f"Description: {analyst.description}")
+                    print(f"Quirky Fact: {analyst.quirky_fact}")
+                    print(f"Relationship History: {analyst.relationship_history}")
                     print("-" * 50)  
 
+        further_feedack = input("Feedback?")
+        if (further_feedack == "no"):
+            further_feedack = None
+
         # If we are satisfied, then we simply supply no feedback
-        further_feedack = None
         graph.update_state(thread, {"human_analyst_feedback": 
                             further_feedack}, as_node="human_feedback")
-   
+        
+        # Continue the graph execution to end
+        for event in graph.stream(None, thread, stream_mode="updates"):
+            print("--Node--")
+            node_name = next(iter(event.keys()))
+            print(node_name)
+        final_state = graph.get_state(thread)
+        analysts = final_state.values.get('analysts')
+        for analyst in analysts:
+                    print(f"Name: {analyst.name}")
+                    print(f"Affiliation: {analyst.affiliation}")
+                    print(f"Role: {analyst.role}")
+                    print(f"Description: {analyst.description}")
+                    print(f"Quirky Fact: {analyst.quirky_fact}")
+                    print(f"Relationship History: {analyst.relationship_history}")
+                    print("-" * 50)  
+
 if __name__ == "__main__":
     rb = RelachatBot()
     rb.main()
