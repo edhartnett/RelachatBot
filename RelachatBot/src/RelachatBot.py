@@ -17,15 +17,19 @@ analyst_instructions="""You are tasked with creating a set of AI analyst persona
 1. First, review the research topic:
 {topic}
         
-2. Examine any editorial feedback that has been optionally provided to guide creation of the analysts: 
+2. Determine a list of important themes or questions that should be addressed by the analysts.
+
+3. Examine any editorial feedback that has been optionally provided to guide creation of the analysts: 
         
 {human_analyst_feedback}
     
-3. Determine the most interesting themes based upon documents and / or feedback above.
+4. Select a list of people, alive or historical, based upon documents and / or feedback above. Include some famous 
+people, like Winston Churchill, Jesus, or Marie Curie. Also include some random people from history, like Johm Carpenter, 
+a 12th century builder from London, or Marcus Lepitus, a Roman soldier. 
                     
-4. Pick the top {max_analysts} themes.
+5. Pick the top {max_analysts} people to be analysts.
 
-5. Assign one analyst to each theme."""
+6. Assign one analyst to each theme."""
 
 
 class RelachatBot:
@@ -95,6 +99,36 @@ class RelachatBot:
         memory = MemorySaver()
         graph = builder.compile(interrupt_before=['human_feedback'], checkpointer=memory)
 
+        # Input
+        max_analysts = 3 
+        topic = '''
+        Relationship advice for dealing with difficult problems with:
+         * friends
+         * romantic partners
+         * roommates and housemates
+         * parents
+         * siblings
+         * business associates
+         * strangers
+        '''
+        thread = {"configurable": {"thread_id": "1"}}
+
+        # Run the graph until the first interruption
+        for event in graph.stream({"topic":topic,"max_analysts":max_analysts,}, thread, stream_mode="values"):
+            # Review
+            analysts = event.get('analysts', '')
+            if analysts:
+                for analyst in analysts:
+                    print(f"Name: {analyst.name}")
+                    print(f"Affiliation: {analyst.affiliation}")
+                    print(f"Role: {analyst.role}")
+                    print(f"Description: {analyst.description}")
+                    print("-" * 50)  
+
+        # If we are satisfied, then we simply supply no feedback
+        further_feedack = None
+        graph.update_state(thread, {"human_analyst_feedback": 
+                            further_feedack}, as_node="human_feedback")
    
 if __name__ == "__main__":
     rb = RelachatBot()
