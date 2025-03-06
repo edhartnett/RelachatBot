@@ -6,3 +6,4 @@ tavily-python
 wikipedia
 langchain-anthropic
 langchain-google-genai
+streamlit
