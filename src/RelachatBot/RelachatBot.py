@@ -476,7 +476,7 @@ class RelachatBot:
     def main(self):
         print("calling main function")
 
-        self.model = init_chat_model("anthropic:claude-3-5-haiku-latest", temperature=0)
+        self.model = init_chat_model("anthropic:claude-3-5-haiku-latest", temperature=0.7)
         #model = init_chat_model("gemini-2.0-flash-001", model_provider="google_vertexai")
         #messages = [
         #     SystemMessage("Translate the following from English into Italian"),
@@ -532,7 +532,7 @@ class RelachatBot:
         builder.add_edge("finalize_report", END)
 
         # Compile
-        memory = MemorySaver()
+        #memory = MemorySaver()
         graph = builder.compile(interrupt_before=['human_feedback'], checkpointer=memory)
         
         messages = [HumanMessage(f"My girlfriend hates my cat, what should I do?")]
